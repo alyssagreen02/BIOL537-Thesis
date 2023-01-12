@@ -27,7 +27,7 @@ alt_sites<-read.table("./Data/try2_selection.sites")
 Create QQplot to QC Test Statistics
 ```{r}
 #Run qqchi function
-source("./Functions/qqchi.R")
+source("./Functions/qqchi_func.R")
 qqchi(npy_dat)
 ```
 
