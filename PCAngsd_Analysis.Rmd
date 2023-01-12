@@ -76,7 +76,7 @@ Attempt 4
 dat=at2%>%filter(marker==1)
 ggplot(data=dat, aes(x=chromosome, y=-log10(pval)))+geom_point()+geom_hline(yintercept=-log10(0.05))
 ```
-Attempt 5: Works but need to find a way to lable graphs
+Attempt 5: Works but need to find a way to label graphs
 ```{r}
 for (i in c(1:46211612)) {
 dat=at2%>%filter(marker==i)
