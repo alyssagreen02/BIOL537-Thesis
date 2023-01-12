@@ -14,14 +14,14 @@ library(dplyr)
 Load Data
 ```{r}
 #Load in .npy file
-npy_dat<- npyLoad("./Data/try2_selection.selection.npy")
+npy_dat<- npyLoad("try2_selection.selection.npy")
 
 #Load in .sites file
-sites<-read.table("./Data/kittiwake.sites", row.names = NULL)
+sites<-read.table("kittiwake.sites", row.names = NULL)
 names(sites)<-c("chromosome","marker")
 
 #Load in alternate 0/1 .sites file
-alt_sites<-read.table("./Data/try2_selection.sites")
+alt_sites<-read.table("try2_selection.sites")
 ```
 
 Create QQplot to QC Test Statistics
