@@ -9,6 +9,9 @@ Load Libraries
 ```{r}
 library(RcppCNPy)
 library(dplyr)
+library(qqman) #for man plot can remove dosent work
+library(ggplot2)
+source("http://bit.ly/theme_pub")
 ```
 
 Load Data
@@ -47,4 +50,38 @@ Remove elements of .sites values where V1=0
 sig=sites%>%filter(V1==1)
 ```
 
- 
+Attempt 1 at Manhattan Plot
+```{r}
+plot(-log10(pval),col=sites$V1==1,xlab="Chromosomes",main="Manhattan plot")
+abline(h=-log10(0.05), col="deeppink1")
+```
+
+Attempt 2
+```{r}
+at2=data.frame(marker=sig$marker, chromosome=sig$chromosome, pval=pval$V1)
+manhattan(at2, chr="marker", bp="marker", p="pval")
+```
+Attempt 3
+library(karyoploteR)
+```{r}
+library(karyoploteR)
+
+kp <- plotKaryotype(plot.type=4)
+kp <- kpPlotManhattan(kp, data=ds$snps)
+```
+
+Attempt 4
+
+```{r}
+dat=at2%>%filter(marker==1)
+ggplot(data=dat, aes(x=chromosome, y=-log10(pval)))+geom_point()+geom_hline(yintercept=-log10(0.05))
+```
+Attempt 5: Works but need to find a way to lable graphs
+```{r}
+for (i in c(1:46211612)) {
+dat=at2%>%filter(marker==i)
+graph=ggplot(data=dat, aes(x=chromosome, y=-log10(pval)))+geom_point()+geom_hline(yintercept=-log10(0.05))+theme_pub()+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) 
+print(graph)
+}
+```
+
