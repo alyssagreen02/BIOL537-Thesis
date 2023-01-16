@@ -11,6 +11,7 @@ library(RcppCNPy)
 library(dplyr)
 library(qqman) #for man plot can remove dosent work
 library(ggplot2)
+library(tidyr)
 source("http://bit.ly/theme_pub")
 ```
 
@@ -25,6 +26,9 @@ names(sites)<-c("chromosome","marker")
 
 #Load in alternate 0/1 .sites file
 alt_sites<-read.table("try2_selection.sites")
+
+#Load Genes File
+Genes=read.csv("Genes.csv")
 ```
 
 Create QQplot to QC Test Statistics
@@ -50,25 +54,23 @@ Remove elements of .sites values where V1=0
 sig=sites%>%filter(V1==1)
 ```
 
-Attempt 1 at Manhattan Plot
+Create data frame combining sites and pvals
 ```{r}
-plot(-log10(pval),col=sites$V1==1,xlab="Chromosomes",main="Manhattan plot")
-abline(h=-log10(0.05), col="deeppink1")
+Combo=data.frame(marker=sig$marker, chromosome=sig$chromosome, pval1=pval$V1, pval2=pval$V2)
 ```
 
-Attempt 2
+Select genes of interest
 ```{r}
-at2=data.frame(marker=sig$marker, chromosome=sig$chromosome, pval=pval$V1)
-manhattan(at2, chr="marker", bp="marker", p="pval")
+Interest_Dat=Combo[(Combo$chromosome %in% Genes$Code),]
 ```
-Attempt 3
-library(karyoploteR)
-```{r}
-library(karyoploteR)
 
-kp <- plotKaryotype(plot.type=4)
-kp <- kpPlotManhattan(kp, data=ds$snps)
+
+```{r}
+dat=Interest_Dat%>%filter(marker==1)
+ggplot(data=dat, aes(x=chromosome, y=-log10(pval1)))+geom_point()+geom_hline(yintercept=-log10(0.05))
 ```
+
+
 
 Attempt 4
 
@@ -80,8 +82,28 @@ Attempt 5: Works but need to find a way to label graphs
 ```{r}
 for (i in c(1:46211612)) {
 dat=at2%>%filter(marker==i)
-graph=ggplot(data=dat, aes(x=chromosome, y=-log10(pval)))+geom_point()+geom_hline(yintercept=-log10(0.05))+theme_pub()+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) 
+graph=ggplot(data=Filtered_Dat, aes(x=chromosome, y=-log10(pval)))+geom_point()+geom_hline(yintercept=-log10(0.05))+theme_pub()+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) 
 print(graph)
 }
+```
+
+```{r}
+for (i in c(31:50)) {
+dat=Interest_Dat%>%filter(marker==i)
+graph=ggplot(data=dat, aes(x=chromosome, y=-log10(pval1)))+geom_point()+geom_hline(yintercept=-log10(0.05))+theme_pub()+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) 
+print(graph)
+}
+```
+VZUC01000049.1:11
+VZUC01000080.1:16
+VZUC01000057.1:28
+VZUC01000451.1:32
+VZUC0100022201:49
+
+
+FIlter data
+```{r}
+Filtered_Dat=at2[(at2$chromosome %in% Genes$Code),]
+Grouped=Filtered_Dat%>%group_by(chromosome)
 ```
 
