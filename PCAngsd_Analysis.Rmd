@@ -9,7 +9,6 @@ Load Libraries
 ```{r}
 library(RcppCNPy)
 library(dplyr)
-library(qqman) #for man plot can remove dosent work
 library(ggplot2)
 library(tidyr)
 source("http://bit.ly/theme_pub")
@@ -34,7 +33,7 @@ Genes=read.csv("Genes.csv")
 Create QQplot to QC Test Statistics
 ```{r}
 #Run qqchi function
-source("./Functions/qqchi_func.R")
+source("./qqchi_func.R")
 qqchi(npy_dat)
 ```
 
@@ -59,51 +58,45 @@ Create data frame combining sites and pvals
 Combo=data.frame(marker=sig$marker, chromosome=sig$chromosome, pval1=pval$V1, pval2=pval$V2)
 ```
 
-Select genes of interest
+Select scaffolds of interest
 ```{r}
 Interest_Dat=Combo[(Combo$chromosome %in% Genes$Code),]
 ```
 
-
+Select markers of interest
 ```{r}
-dat=Interest_Dat%>%filter(marker==1)
-ggplot(data=dat, aes(x=chromosome, y=-log10(pval1)))+geom_point()+geom_hline(yintercept=-log10(0.05))
-```
+to_keep = c()
+gene_annotation = c()
+scaffold=c()
+p1=c()
+p2=c()
 
 
-
-Attempt 4
-
-```{r}
-dat=at2%>%filter(marker==1)
-ggplot(data=dat, aes(x=chromosome, y=-log10(pval)))+geom_point()+geom_hline(yintercept=-log10(0.05))
-```
-Attempt 5: Works but need to find a way to label graphs
-```{r}
-for (i in c(1:46211612)) {
-dat=at2%>%filter(marker==i)
-graph=ggplot(data=Filtered_Dat, aes(x=chromosome, y=-log10(pval)))+geom_point()+geom_hline(yintercept=-log10(0.05))+theme_pub()+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) 
-print(graph)
+  for (i in 1:length(Combo$chromosome)) {
+  for (j in 1:length(Genes$Code)){
+      if (Genes$Code[j] == Combo$chromosome[i]){
+        if(between(Combo$marker[i], Genes$Min[j], Genes$Max[j])){
+            to_keep = c(to_keep,i)
+            gene_annotation = c(gene_annotation,Genes$Gene[j])
+            scaffold=c(scaffold, Combo$chromosome[i])
+            p1=c(p1, Combo$pval1[i])
+            p2=c(p2, Combo$pval2[i])
+            
+              }
+         }
+    }
 }
+
+```
+Create data frame with information for genes on interest
+```{r}
+Data=data.frame(gene_annotation, scaffold, marker=to_keep, p1, p2)
+head(Data)
+
 ```
 
+Manhattan plot
 ```{r}
-for (i in c(31:50)) {
-dat=Interest_Dat%>%filter(marker==i)
-graph=ggplot(data=dat, aes(x=chromosome, y=-log10(pval1)))+geom_point()+geom_hline(yintercept=-log10(0.05))+theme_pub()+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) 
-print(graph)
-}
-```
-VZUC01000049.1:11
-VZUC01000080.1:16
-VZUC01000057.1:28
-VZUC01000451.1:32
-VZUC0100022201:49
-
-
-FIlter data
-```{r}
-Filtered_Dat=at2[(at2$chromosome %in% Genes$Code),]
-Grouped=Filtered_Dat%>%group_by(chromosome)
+ggplot(aes(x=gene_annotation, y=-log(p1)), data=Data)+geom_point()+theme_pub()
 ```
 
