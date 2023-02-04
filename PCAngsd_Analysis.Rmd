@@ -4,6 +4,7 @@ author: "Alyssa Green"
 date: "`r Sys.Date()`"
 output: html_document
 ---
+Code based from: PCAngsdTutorial—Software. (n.d.). Retrieved February 4, 2023, from http://www.popgen.dk/software/index.php/PCAngsdTutorial
 
 Load Libraries
 ```{r}
@@ -11,7 +12,7 @@ library(RcppCNPy)
 library(dplyr)
 library(ggplot2)
 library(tidyr)
-source("http://bit.ly/theme_pub")
+source("http://bit.ly/theme_pub") # By Dr. Rob Colautti
 ```
 
 Load Data
