@@ -56,6 +56,8 @@ sig=sites%>%filter(V1==1)
 Create data frame combining sites and pvals
 ```{r}
 Combo=data.frame(marker=sig$marker, chromosome=sig$chromosome, pval1=pval$V1, pval2=pval$V2)
+C1=Combo%>%filter(-log10(pval1)>5.4)
+C2=Combo%>%filter(-log10(pval2)>5.4)
 ```
 
 Select scaffolds of interest
@@ -88,6 +90,7 @@ p2=c()
 }
 
 ```
+
 Create data frame with information for genes on interest
 ```{r}
 Data=data.frame(gene_annotation, scaffold, marker=to_keep, p1, p2)
@@ -95,8 +98,23 @@ head(Data)
 
 ```
 
-Manhattan plot
+Manhattan plots
 ```{r}
-ggplot(aes(x=gene_annotation, y=-log(p1)), data=Data)+geom_point()+theme_pub()
+ggplot(aes(x=gene_annotation, y=-log10(p1), colour=gene_annotation), data=Data)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p1Value)")+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=2))
+
+ggplot(aes(x=gene_annotation, y=-log10(p2), colour=gene_annotation), data=Data)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p2Value)")+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=2))
+```
+
+```{r}
+P1Sig=Data%>%filter(p1<0.05)
+P2Sig=Data%>%filter(p2<0.05)
+
+
+DupSig1=data.frame(gene=P1Sig$gene_annotation, TF=!duplicated(P1Sig$gene_annotation))
+DupSig1=DupSig1%>%filter(TF==TRUE)
+
+DupSig2=data.frame(gene=P2Sig$gene_annotation, TF=!duplicated(P2Sig$gene_annotation))
+DupSig2=DupSig2%>%filter(TF==TRUE)
+
 ```
 
