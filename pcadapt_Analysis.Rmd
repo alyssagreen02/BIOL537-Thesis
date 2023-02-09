@@ -1,0 +1,147 @@
+---
+title: "pcadapt"
+author: "Alyssa Green"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+Load Libraries
+```{r}
+library(RcppCNPy)
+library(dplyr)
+library(ggplot2)
+library(gridExtra)
+source("http://bit.ly/theme_pub") # By Dr. Rob Colautti
+```
+
+Load Data
+```{r}
+#Load in .npy file
+Zscores=npyLoad("pcadapt_selection.pcadapt.zscores.npy")
+
+#Load in .args file
+args=read.csv("pcadapt_selection.args")
+
+#Load in .cov file
+cov=read.table("pcadapt_selection.cov")
+
+#Load in .sites file
+sites<-read.table("kittiwake.sites", row.names = NULL)
+names(sites)<-c("chromosome","marker")
+
+#Load in alt .sites file
+alt_sites=read.table("pcadapt_selection.sites")
+
+#Load Genes File
+Genes=read.csv("Genes.csv")
+```
+
+Create QQplot to QC Test Statistics
+```{r}
+#Run qqchi function
+source("./qqchi_func.R")
+qqchi(Zscores)
+```
+
+Convert test statistics to p-values (using pcadapt_script.R)
+```{r}
+pval=(Zscores - median(Zscores))^2
+pval=as.data.frame(pval)
+```
+
+```{r}
+sites$V1=alt_sites$V1
+```
+
+Remove elements of .sites values where V1=0
+```{r}
+sig=sites%>%filter(V1==1)
+```
+
+Create data frame combining sites and pvals
+```{r}
+Combo=data.frame(marker=sig$marker, chromosome=sig$chromosome, pval1=pval$V1, pval2=pval$V2)
+```
+
+```{r}
+to_keep = c()
+gene_annotation = c()
+scaffold=c()
+p1=c()
+p2=c()
+group=c()
+
+
+  for (i in 1:length(Combo$chromosome)) {
+  for (j in 1:length(Genes$Code)){
+      if (Genes$Code[j] == Combo$chromosome[i]){
+        if(between(Combo$marker[i], Genes$Min[j], Genes$Max[j])){
+            to_keep = c(to_keep,i)
+            gene_annotation = c(gene_annotation,Genes$Gene[j])
+            scaffold=c(scaffold, Combo$chromosome[i])
+            p1=c(p1, Combo$pval1[i])
+            p2=c(p2, Combo$pval2[i])
+            group=c(group, Genes$Group[j])
+            
+              }
+         }
+    }
+}
+
+```
+
+Create data frame with information for genes on interest
+```{r}
+Data=data.frame(gene_annotation, scaffold, marker=to_keep, p1, p2, group)
+head(Data)
+
+```
+
+Filter data by group
+```{r}
+CytB=Data%>%filter(group=="CytB")
+DNAPol=Data%>%filter(group=="DNA Pol")
+RNAPol=Data%>%filter(group=="RNA Pol")
+GRE=Data%>%filter(group=="Glucocorticoid")
+Tel=Data%>%filter(group=="Telomeres")
+Thy=Data%>%filter(group=="Thyroid")
+```
+
+Manhattan Plot P1
+```{r}
+ggplot(aes(x=gene_annotation, y=-log10(p1), colour=gene_annotation), data=CytB)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p1Value)")+ ggtitle("CytB")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14))
+
+ggplot(aes(x=gene_annotation, y=-log10(p1), colour=gene_annotation), data=DNAPol)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p1Value)")+ ggtitle("DNA Polymerase")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14))
+
+ggplot(aes(x=gene_annotation, y=-log10(p1), colour=gene_annotation), data=RNAPol)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p1Value)")+ ggtitle("RNA Polymerase")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14))
+
+ggplot(aes(x=gene_annotation, y=-log10(p1), colour=gene_annotation), data=GRE)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p1Value)")+ ggtitle("GRE")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14))
+
+ggplot(aes(x=gene_annotation, y=-log10(p1), colour=gene_annotation), data=Tel)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p1Value)")+ ggtitle("Telomeres")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=5))
+
+ggplot(aes(x=gene_annotation, y=-log10(p1), colour=gene_annotation), data=Thy)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p1Value)")+ ggtitle("Thyroid")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=8))
+
+ggplot(aes(x=gene_annotation, y=-log10(p1), colour=gene_annotation), data=Data)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p1Value)")+ ggtitle("All Genes")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=2))
+
+```
+
+
+Manhattan Plot P2
+```{r}
+ggplot(aes(x=gene_annotation, y=-log10(p2), colour=gene_annotation), data=CytB)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p2Value)")+ ggtitle("CytB")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14))
+
+ggplot(aes(x=gene_annotation, y=-log10(p2), colour=gene_annotation), data=DNAPol)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p2Value)")+ ggtitle("DNA Polymerase")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14))
+
+ggplot(aes(x=gene_annotation, y=-log10(p2), colour=gene_annotation), data=RNAPol)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p2Value)")+ ggtitle("RNA Polymerase")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14))
+
+ggplot(aes(x=gene_annotation, y=-log10(p2), colour=gene_annotation), data=GRE)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p2Value)")+ ggtitle("GRE")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14))
+
+ggplot(aes(x=gene_annotation, y=-log10(p2), colour=gene_annotation), data=Tel)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p2Value)")+ ggtitle("Telomeres")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=5))
+
+ggplot(aes(x=gene_annotation, y=-log10(p2), colour=gene_annotation), data=Thy)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p2Value)")+ ggtitle("Thyroid")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=8))
+
+ggplot(aes(x=gene_annotation, y=-log10(p2), colour=gene_annotation), data=Data)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p2Value)")+ ggtitle("All Genes")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=2))
+
+```
+
+
