@@ -11,7 +11,6 @@ Load Libraries
 library(RcppCNPy)
 library(dplyr)
 library(ggplot2)
-library(tidyr)
 source("http://bit.ly/theme_pub") # By Dr. Rob Colautti
 ```
 
@@ -38,7 +37,7 @@ source("./qqchi_func.R")
 qqchi(npy_dat)
 ```
 
-Convert Test Statistics to p-values
+Convert test statistics to p-values
 ```{r}
 pval=1-pchisq(npy_dat,1)
 pval=as.data.frame(pval)
@@ -57,8 +56,6 @@ sig=sites%>%filter(V1==1)
 Create data frame combining sites and pvals
 ```{r}
 Combo=data.frame(marker=sig$marker, chromosome=sig$chromosome, pval1=pval$V1, pval2=pval$V2)
-C1=Combo%>%filter(-log10(pval1)>5.4)
-C2=Combo%>%filter(-log10(pval2)>5.4)
 ```
 
 Select markers of interest
@@ -88,8 +85,6 @@ group=c()
 }
 
 ```
-
-
 
 Create data frame with information for genes on interest
 ```{r}
