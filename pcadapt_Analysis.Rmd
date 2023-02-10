@@ -108,23 +108,36 @@ Thy=Data%>%filter(group=="Thyroid")
 
 Manhattan Plot P1
 ```{r}
-ggplot(aes(x=gene_annotation, y=-log10(p), colour=gene_annotation), data=CytB)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+ ggtitle("CytB")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14))
-
-ggplot(aes(x=gene_annotation, y=-log10(p), colour=gene_annotation), data=DNAPol)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+ ggtitle("DNA Polymerase")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14))
-
-ggplot(aes(x=gene_annotation, y=-log10(p), colour=gene_annotation), data=RNAPol)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+ ggtitle("RNA Polymerase")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14))
-
-ggplot(aes(x=gene_annotation, y=-log10(p), colour=gene_annotation), data=GRE)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+ ggtitle("GRE")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14))
-
-ggplot(aes(x=gene_annotation, y=-log10(p), colour=gene_annotation), data=Tel)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+ ggtitle("Telomeres")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=5))
-
-ggplot(aes(x=gene_annotation, y=-log10(p), colour=gene_annotation), data=Thy)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+ ggtitle("Thyroid")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=8))
-
 ggplot(aes(x=gene_annotation, y=-log10(p), colour=gene_annotation), data=Data)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+ ggtitle("All Genes")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=2))
 
 ```
+CytB
+```{r}
+ggplot(aes(x=gene_annotation, y=-log10(p), colour=gene_annotation), data=CytB)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14))
+```
 
+DNAPol
+```{r}
+ggplot(aes(x=gene_annotation, y=-log10(p), colour=gene_annotation), data=DNAPol)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14))
+```
 
+RNA Pol
+```{r}
+ggplot(aes(x=gene_annotation, y=-log10(p), colour=gene_annotation), data=RNAPol)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14))
+```
 
+GRE
+```{r}
+ggplot(aes(x=gene_annotation, y=-log10(p), colour=gene_annotation), data=GRE)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14))
+```
 
+Tel
+```{r}
+ggplot(aes(x=gene_annotation, y=-log10(p), colour=gene_annotation), data=Tel)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=5))
+```
+
+Thy
+```{r}
+ggplot(aes(x=gene_annotation, y=-log10(p), colour=gene_annotation), data=Thy)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=8))
+```
 
