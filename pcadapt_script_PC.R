@@ -22,5 +22,6 @@ if (K == 1) {
         d2 <- dist_ogk(zscores)
 }
 
-write.table(d2, file=paste0(args[2], ".pcadapt.test.txt"), quote=F, row.names=F, col.names=F)
-write.table(pchisq(d2, df=K, lower.tail=F), file="test.pcadapt.pval.txt", quote=F, row.names=F, col.names=F)
+write.table(pchisq(d2, df=K, lower.tail=F), file="PC.pcadapt.pval.txt", quote=F, row.names=F, col.names=F)
+
+
