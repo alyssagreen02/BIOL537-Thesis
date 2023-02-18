@@ -10,7 +10,8 @@ Load Libraries
 library(RcppCNPy)
 library(dplyr)
 library(ggplot2)
-library(gridExtra)
+library(BiocManager)
+library(qvalue)
 source("http://bit.ly/theme_pub") # By Dr. Rob Colautti
 ```
 
@@ -43,12 +44,21 @@ source("./qqchi_func.R")
 qqchi(Zscores)
 ```
 
+
 Convert test statistics to p-values (following pcadapt_script.R)
 ```{r}
-source("./pcadapt_script.R")
-pval=read.table("test.pcadapt.pval.txt")
+source("./pcadapt_script_PC.R")
+PCp=read.table("PC.pcadapt.pval.txt")
 ```
 
+Adjusting p values to q values following Caplins, S. (2021). Marine Genomics 2021. https://baylab.github.io/MarineGenomics/week-7--fst-and-outlier-analysis.html#finding-outliers-using-pcadapt
+```{r}
+qval <- qvalue(PCp)$qvalues
+outliers <- which(qval<0.1)
+length(outliers)
+```
+
+Aligning sites files
 ```{r}
 sites$V1=alt_sites$V1
 ```
@@ -60,7 +70,7 @@ sig=sites%>%filter(V1==1)
 
 Create data frame combining sites and pvals
 ```{r}
-Combo=data.frame(marker=sig$marker, chromosome=sig$chromosome, pval=pval$V1)
+Combo=data.frame(marker=sig$marker, chromosome=sig$chromosome, qval=qval$V1)
 ```
 
 Select markers of interest
@@ -68,7 +78,7 @@ Select markers of interest
 to_keep = c()
 gene_annotation = c()
 scaffold=c()
-p=c()
+q=c()
 group=c()
 
 
@@ -79,7 +89,7 @@ group=c()
             to_keep = c(to_keep,i)
             gene_annotation = c(gene_annotation,Genes$Gene[j])
             scaffold=c(scaffold, Combo$chromosome[i])
-            p=c(p, Combo$pval[i])
+            q=c(q, Combo$qval[i])
             group=c(group, Genes$Group[j])
             
               }
@@ -91,53 +101,43 @@ group=c()
 
 Create data frame with information for genes on interest
 ```{r}
-Data=data.frame(gene_annotation, scaffold, marker=to_keep, p, group)
+Data=data.frame(gene_annotation, scaffold, marker=to_keep, q, group)
 head(Data)
 
 ```
 
-Filter data by group
+Number of significant hits, and filter non-significant results from data set
 ```{r}
-CytB=Data%>%filter(group=="CytB")
-DNAPol=Data%>%filter(group=="DNA Pol")
-RNAPol=Data%>%filter(group=="RNA Pol")
-GRE=Data%>%filter(group=="Glucocorticoid")
-Tel=Data%>%filter(group=="Telomeres")
-Thy=Data%>%filter(group=="Thyroid")
+outliers <- which(Data$q<10^{-5.4})
+length(outliers)
+Outliers=Data%>%filter(q<approxt)
 ```
 
-Manhattan Plot P1
+Check number of genes with significant results
 ```{r}
-ggplot(aes(x=gene_annotation, y=-log10(p), colour=gene_annotation), data=Data)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+ ggtitle("All Genes")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=2))
-
-```
-CytB
-```{r}
-ggplot(aes(x=gene_annotation, y=-log10(p), colour=gene_annotation), data=CytB)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14))
+no_duplicates=distinct(Outliers, gene_annotation, .keep_all = TRUE)
+dim(no_duplicates)
 ```
 
-DNAPol
+Check name and number of genes in each gene group
 ```{r}
-ggplot(aes(x=gene_annotation, y=-log10(p), colour=gene_annotation), data=DNAPol)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14))
+rp=filter(no_duplicates, group == "RNA Pol")
+dp=filter(no_duplicates, group == "DNA Pol")
+thy=filter(no_duplicates, group == "Thyroid")
+glu=filter(no_duplicates, group == "Glucocorticoid")
+tel=filter(no_duplicates, group == "Telomeres")
+cB=filter(no_duplicates, group == "CytB")
+
+nrow(rp)
+nrow(dp)
+nrow(thy)
+nrow(glu)
+nrow(tel)
+nrow(cB)
 ```
 
-RNA Pol
-```{r}
-ggplot(aes(x=gene_annotation, y=-log10(p), colour=gene_annotation), data=RNAPol)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14))
-```
 
-GRE
-```{r}
-ggplot(aes(x=gene_annotation, y=-log10(p), colour=gene_annotation), data=GRE)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14))
+Manhattan Plot
+```{r, fig.width=10, fig.height=2}
+ggplot(aes(x=gene_annotation, y=-log10(q), colour=group), data=Data)+geom_point()+theme_pub()+geom_hline(yintercept=-5.4, colour="black")+xlab("Gene")+ylab("-log10(q-value)")+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=5))+theme(plot.title = element_text(hjust = 0))
 ```
-
-Tel
-```{r}
-ggplot(aes(x=gene_annotation, y=-log10(p), colour=gene_annotation), data=Tel)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=5))
-```
-
-Thy
-```{r}
-ggplot(aes(x=gene_annotation, y=-log10(p), colour=gene_annotation), data=Thy)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=8))
-```
-
