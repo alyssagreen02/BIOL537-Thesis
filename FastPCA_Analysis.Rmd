@@ -102,7 +102,7 @@ P1 all
 ```{r, fig.width=10, fig.height=2}
 ggplot(aes(x=gene_annotation, y=-log10(p1), colour=group), data=Data)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=4))+ theme(legend.position = "right")+scale_color_discrete(labels=c("Cytochrome B", "DNA Polymerase", "GRE", "RNA Polymerase","Telomerase", "Thyroid"))+guides(color=guide_legend(title="Gene Group"))
 
-pp1=ggplot(aes(x=gene_annotation, y=-log10(p1), colour=group), data=Data)+geom_point()+theme_pub()+geom_hline(yintercept=5.4, colour="hotpink")+theme(axis.title.x = element_blank(), axis.title.y = element_blank())+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=5))+theme(plot.title = element_text(hjust = 0))+ggtitle("A")
+pp1=ggplot(aes(x=gene_annotation, y=-log10(p1), colour=group), data=Data)+geom_point()+theme_pub()+geom_hline(yintercept=5.4, colour="black")+theme(axis.title.x = element_blank(), axis.title.y = element_blank())+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=5))+theme(plot.title = element_text(hjust = 0))+ggtitle("A")
 ```
 
 
@@ -110,7 +110,7 @@ P2 all
 ```{r, fig.width=10, fig.height=2}
 ggplot(aes(x=gene_annotation, y=-log10(p2), colour=group), data=Data)+geom_point()+theme_pub()+geom_hline(yintercept=5.4)+xlab("Gene")+ylab("-log10(p-value)")+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=4))+ theme(legend.position = "right")+scale_color_discrete(labels=c("Cytochrome B", "DNA Polymerase", "Glucocorticoid", "RNA Polymerase","Telomerase", "Thyroid"))+guides(color=guide_legend(title="Gene Group"))
 
-pp2=ggplot(aes(x=gene_annotation, y=-log10(p2), colour=group), data=Data)+geom_point()+theme_pub()+geom_hline(yintercept=5.4, colour="hotpink")+theme(axis.title.x = element_blank(), axis.title.y = element_blank())+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=5))+theme(plot.title = element_text(hjust = 0))+ggtitle("B")
+pp2=ggplot(aes(x=gene_annotation, y=-log10(p2), colour=group), data=Data)+geom_point()+theme_pub()+geom_hline(yintercept=5.4, colour="black")+theme(axis.title.x = element_blank(), axis.title.y = element_blank())+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=5))+theme(plot.title = element_text(hjust = 0))+ggtitle("B")
 ```
 
 
