@@ -139,5 +139,5 @@ nrow(cB)
 
 Manhattan Plot
 ```{r, fig.width=10, fig.height=2}
-ggplot(aes(x=gene_annotation, y=-log10(q), colour=group), data=Data)+geom_point()+theme_pub()+geom_hline(yintercept=-5.4, colour="black")+xlab("Gene")+ylab("-log10(q-value)")+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=5))+theme(plot.title = element_text(hjust = 0))
+ggplot(aes(x=gene_annotation, y=-log10(q), colour=group), data=Data)+geom_point()+theme_pub()+geom_hline(yintercept=5.4, colour="black")+xlab("Gene")+ylab("-log10(q-value)")+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=5))+theme(plot.title = element_text(hjust = 0))
 ```
