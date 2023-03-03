@@ -108,9 +108,18 @@ head(Data)
 
 Number of significant hits, and filter non-significant results from data set
 ```{r}
-outliers <- which(Data$q<10^{-5.4})
+outliers <- which(Data$q<1.07*10^{-9})
 length(outliers)
-Outliers=Data%>%filter(q<approxt)
+Outliers=Data%>%filter(q<1.07*10^{-9})
+```
+
+Find number of outliers for each gene and order from most to least outliers
+```{r}
+OutGene=Outliers%>%group_by(gene_annotation)%>%summarise(total_count=n(),
+            .groups = 'drop')
+OutGeneOrder=OutGene%>%arrange(desc(total_count))
+
+head(OutGeneOrder)
 ```
 
 Check number of genes with significant results
@@ -139,5 +148,5 @@ nrow(cB)
 
 Manhattan Plot
 ```{r, fig.width=10, fig.height=2}
-ggplot(aes(x=gene_annotation, y=-log10(q), colour=group), data=Data)+geom_point()+theme_pub()+geom_hline(yintercept=5.4, colour="black")+xlab("Gene")+ylab("-log10(q-value)")+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=5))+theme(plot.title = element_text(hjust = 0))
+ggplot(aes(x=gene_annotation, y=-log10(q), colour=group), data=Data)+geom_point()+theme_pub()+geom_hline(yintercept=-log10(1.07*10^(-9)), colour="black")+xlab("Gene")+ylab("-log10(q-value)")+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=5))+theme(plot.title = element_text(hjust = 0))
 ```
