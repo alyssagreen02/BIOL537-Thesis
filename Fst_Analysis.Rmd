@@ -1,0 +1,37 @@
+---
+title: "Fst_Analysis"
+author: "Alyssa Green"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+Load Library
+```{r}
+library(OutFLANK)
+library(stringr)
+library(dplyr)
+```
+Load Workspaces
+```{r}
+fst_table <- readRDS("fst_edited_all.rds")
+outflank_res <- readRDS("outflank_output.rds")
+```
+
+Load Results Data into Data Frame
+```{r}
+Results=as.data.frame(outflank_res$results)
+```
+
+Create QQplot to QC Test Statistics
+```{r}
+#Run qqchi function
+source("./qqchi_func.R")
+qqchi(Results$qvalues)
+```
+
+Test for significant outliers
+```{r}
+OutliersTRUE=Results%>%filter(OutlierFlag==TRUE)
+OutliersFALSE=Results%>%filter(OutlierFlag==FALSE)
+```
+
