@@ -13,7 +13,6 @@ library(dplyr)
 ```
 Load Workspaces
 ```{r}
-fst_table <- readRDS("fst_edited_all.rds")
 outflank_res <- readRDS("outflank_output.rds")
 ```
 
