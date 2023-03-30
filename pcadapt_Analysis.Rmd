@@ -37,19 +37,20 @@ alt_sites=read.table("pcadapt_selection.sites")
 Genes=read.csv("Genes.csv")
 ```
 
-Create QQplot to QC Test Statistics
-```{r}
-#Run qqchi function
-source("./qqchi_func.R")
-qqchi(Zscores)
-```
-
 
 Convert test statistics to p-values (following pcadapt_script.R)
 ```{r}
 source("./pcadapt_script_PC.R")
 PCp=read.table("PC.pcadapt.pval.txt")
 ```
+
+Create QQplot to QC Test Statistics
+```{r}
+#Run qqchi function
+source("./qqchi_func.R")
+qqchi(PCp$V1)
+```
+
 
 Adjusting p values to q values following Caplins, S. (2021). Marine Genomics 2021. https://baylab.github.io/MarineGenomics/week-7--fst-and-outlier-analysis.html#finding-outliers-using-pcadapt
 ```{r}
